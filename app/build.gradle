@@ -10,7 +10,13 @@ android {
         applicationId 'com.simpleai.app'
         minSdk 23
         targetSdk 35
-        versionCode 2
-        versionName '0.0.2'
+        versionCode 3
+        versionName '0.0.3'
+    }
+
+    // On-device text generation with a local .task model.
+    // MediaPipe LLM Inference is maintenance-only; evaluate LiteRT-LM for future migrations.
+    dependencies {
+        implementation 'com.google.mediapipe:tasks-genai:0.10.27'
     }
 }
