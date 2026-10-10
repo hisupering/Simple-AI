@@ -96,52 +96,95 @@ public class MainActivity extends Activity {
     private void downloadModel() {
         if (modelDownloading || modelLoading) return;
         modelDownloading = true;
-        modelStatus = "Downloading the AI model automatically (about 167 MB)...";
+        modelStatus = "Preparing a reliable AI model download (about 167 MB)...";
         sendJs("onLocalModelStatus", modelStatus);
         modelExecutor.execute(() -> {
             File temp = new File(getFilesDir(), "simpleai-model.tmp");
             HttpURLConnection connection = null;
             try {
-                connection = (HttpURLConnection) new URL(MODEL_URL).openConnection();
-                connection.setConnectTimeout(20000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                connection.setRequestProperty("User-Agent", "SimpleAI-Android/0.0.5");
-                connection.connect();
-                int status = connection.getResponseCode();
-                if (status < 200 || status >= 300) {
-                    throw new IllegalStateException("The model server returned HTTP " + status + ".");
-                }
-                long total = connection.getContentLengthLong();
-                try (InputStream in = connection.getInputStream();
-                     FileOutputStream out = new FileOutputStream(temp)) {
-                    byte[] buffer = new byte[256 * 1024];
-                    int count;
-                    long received = 0;
-                    int lastPercent = -1;
-                    while ((count = in.read(buffer)) != -1) {
-                        received += count;
-                        out.write(buffer, 0, count);
-                        if (total > 0) {
-                            int percent = (int) (received * 100 / total);
-                            if (percent != lastPercent && percent % 5 == 0) {
-                                lastPercent = percent;
-                                modelStatus = "Downloading model: " + percent + "%";
-                                sendJs("onLocalModelStatus", modelStatus);
+                boolean complete = false;
+                Exception lastError = null;
+                for (int attempt = 1; attempt <= 5 && !complete; attempt++) {
+                    long existing = temp.exists() ? temp.length() : 0L;
+                    try {
+                        URL url = new URL(MODEL_URL + "?download=true");
+                        connection = (HttpURLConnection) url.openConnection();
+                        connection.setConnectTimeout(60000);
+                        connection.setReadTimeout(120000);
+                        connection.setInstanceFollowRedirects(true);
+                        connection.setUseCaches(false);
+                        connection.setRequestProperty("User-Agent", "SimpleAI-Android/0.0.6");
+                        connection.setRequestProperty("Accept-Encoding", "identity");
+                        if (existing > 0) connection.setRequestProperty("Range", "bytes=" + existing + "-");
+                        connection.connect();
+                        int status = connection.getResponseCode();
+                        if (status == HttpURLConnection.HTTP_REQUESTED_RANGE_NOT_SATISFIABLE && existing > 100000000L) {
+                            complete = true;
+                            break;
+                        }
+                        if (status != HttpURLConnection.HTTP_OK && status != HttpURLConnection.HTTP_PARTIAL) {
+                            throw new IllegalStateException("Download server returned HTTP " + status);
+                        }
+                        boolean append = status == HttpURLConnection.HTTP_PARTIAL && existing > 0;
+                        if (!append) existing = 0;
+                        long responseLength = connection.getContentLengthLong();
+                        long total = responseLength > 0 ? responseLength + existing : -1;
+                        try (InputStream in = connection.getInputStream();
+                             FileOutputStream out = new FileOutputStream(temp, append)) {
+                            byte[] buffer = new byte[256 * 1024];
+                            int count;
+                            long received = existing;
+                            int lastPercent = -1;
+                            long lastReportedMb = -1;
+                            while ((count = in.read(buffer)) != -1) {
+                                received += count;
+                                out.write(buffer, 0, count);
+                                if (total > 0) {
+                                    int percent = (int) Math.min(100, received * 100 / total);
+                                    if (percent != lastPercent && percent % 2 == 0) {
+                                        lastPercent = percent;
+                                        modelStatus = "Downloading AI model: " + percent + "%";
+                                        sendJs("onLocalModelStatus", modelStatus);
+                                    }
+                                } else {
+                                    long mb = received / (1024 * 1024);
+                                    if (mb != lastReportedMb && mb % 5 == 0) {
+                                        lastReportedMb = mb;
+                                        modelStatus = "Downloading AI model: " + mb + " MB";
+                                        sendJs("onLocalModelStatus", modelStatus);
+                                    }
+                                }
                             }
+                            out.flush();
+                        }
+                        if (temp.length() < 100000000L) {
+                            throw new IllegalStateException("The downloaded file is too small; the connection may have stopped.");
+                        }
+                        complete = true;
+                    } catch (Exception e) {
+                        lastError = e;
+                        modelStatus = "Download interrupted. Keeping downloaded data and retrying (" + attempt + "/5)...";
+                        sendJs("onLocalModelStatus", modelStatus);
+                    } finally {
+                        if (connection != null) {
+                            connection.disconnect();
+                            connection = null;
                         }
                     }
-                    out.flush();
                 }
-                if (temp.length() < 100000000) {
-                    throw new IllegalStateException("The model file is incomplete. Check your internet connection and try again.");
+                if (!complete) {
+                    throw new IllegalStateException("Could not download the model after 5 attempts. Tap Retry AI, switch network/VPN if needed, and try again. " +
+                            (lastError == null ? "" : safeMessage(lastError)));
                 }
-                if (modelFile.exists()) modelFile.delete();
-                if (!temp.renameTo(modelFile)) throw new IllegalStateException("Could not save the model to app storage.");
+                if (modelFile.exists() && !modelFile.delete()) {
+                    throw new IllegalStateException("Could not replace the old model file.");
+                }
+                if (!temp.renameTo(modelFile)) {
+                    throw new IllegalStateException("Could not save the downloaded model to app storage.");
+                }
                 runOnUiThread(() -> loadModel(modelFile));
             } catch (Exception e) {
-                temp.delete();
-                modelStatus = "Model download failed. Check your internet connection and try again. " + safeMessage(e);
+                modelStatus = "AI model download failed. Your partial download is kept for retry. Check internet/VPN, then tap Retry AI. " + safeMessage(e);
                 sendJs("onLocalModelStatus", modelStatus);
             } finally {
                 if (connection != null) connection.disconnect();
