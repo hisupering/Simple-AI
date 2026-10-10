@@ -113,9 +113,9 @@ textarea::placeholder{color:#789584}
       <div class="mobile-brand"><div class="logo">S</div><span>Simple <span style="color:var(--green)">AI</span></span></div>
       <div class="top-title-wrap"><div class="top-title">گفت‌وگوی هوشمند</div><div class="top-sub">ساده، محترمانه، همراه تو</div></div>
       <div class="top-spacer"></div><div class="version">v.0.0.3</div>
-      <button class="chip" id="modelButton" type="button" style="padding:8px 10px">انتخاب مدل محلی</button>
+      <button class="chip" id="modelButton" type="button" style="padding:8px 10px">آماده‌سازی مدل</button>
     </header>
-    <div id="modelStatus" role="status" style="padding:9px 18px;background:#f1faf4;border-bottom:1px solid #dceee2;color:#286443;font-size:11px;line-height:1.8">برای شروع، فایل مدل محلی با پسوند .task را انتخاب کن. بعد از بارگذاری، چت روی گوشی اجرا می‌شود.</div>
+    <div id="modelStatus" role="status" style="padding:9px 18px;background:#f1faf4;border-bottom:1px solid #dceee2;color:#286443;font-size:11px;line-height:1.8">مدل هوش مصنوعی به‌صورت خودکار دریافت و روی گوشی آماده می‌شود؛ حجم تقریبی ۱۶۷ مگابایت.</div>
     <section class="chat-area" id="chatArea">
       <div class="welcome" id="welcome">
         <div class="welcome-logo">S</div>
@@ -214,7 +214,7 @@ async function sendMessage(){
   }
   if(!window.SimpleLocalAI.isModelReady()){
     updateModelStatus('هنوز مدل آماده نیست. روی «انتخاب مدل محلی» بزن و یک فایل سازگار .task انتخاب کن.');
-    addMessage('assistant','برای پاسخ‌دادن، اول باید مدل هوش مصنوعی را روی گوشی بارگذاری کنیم. روی دکمه «انتخاب مدل محلی» بزن و فایل سازگار با MediaPipe با پسوند .task را انتخاب کن.');
+    addMessage('assistant','برای پاسخ‌دادن، اول باید مدل هوش مصنوعی را روی گوشی بارگذاری کنیم. لطفاً صبر کن تا برنامه مدل را به‌صورت خودکار دریافت و آماده کند. برای این مرحله اینترنت و حدود ۱ گیگابایت فضای آزاد پیشنهاد می‌شود.');
     return;
   }
   if(!currentTitle)currentTitle=text.length>26?text.slice(0,26)+'…':text;
