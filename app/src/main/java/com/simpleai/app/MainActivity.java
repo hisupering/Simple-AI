@@ -196,8 +196,8 @@ public class MainActivity extends Activity {
                     return;
                 }
                 try {
-                    String formatted = "<start_of_turn>user\n" + prompt
-                            + "\n<end_of_turn>\n<start_of_turn>model\n";
+                    String formatted = "<|im_start|>user\\n" + prompt
+                            + "<|im_end|>\\n<|im_start|>assistant\\n";
                     String response = engine.generateResponse(formatted);
                     sendJs("onLocalModelChunk", requestId, response, "true");
                 } catch (Exception e) {
