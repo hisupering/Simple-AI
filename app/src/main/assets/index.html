@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#ffffff">
-<title>Simple AI — v.0.0.2</title>
+<title>Simple AI — v.0.0.3</title>
 <style>
 :root{--bg:#07110d;--panel:#0b1711;--panel2:#101f17;--line:#20382a;--green:#39e58c;--green2:#18b968;--text:#edf8f1;--muted:#91a99a;--user:#123b29;--shadow:0 24px 80px #0007}
 *{box-sizing:border-box}
@@ -62,7 +62,7 @@ textarea::placeholder{color:#6e8c78}
 .message{max-width:96%}.bubble{font-size:13px;padding:11px 12px}.composer-wrap{padding:0 10px 10px}.composer{border-radius:16px}.footnote{font-size:9px}
 }
 
-/* v0.0.2 — bright green and white theme */
+/* v0.0.3 — bright green and white theme */
 :root{--bg:#f5fbf7;--panel:#ffffff;--panel2:#effaf3;--line:#d6ebdd;--green:#0b9f55;--green2:#087f45;--text:#163b27;--muted:#5f7d6a;--user:#e5f7ec;--shadow:0 18px 50px #164c2a12}
 body{background:linear-gradient(180deg,#eaf8ef 0,#ffffff 38%,#f7fcf8 100%);color:var(--text)}
 .sidebar{background:#ffffff;border-color:#d8ecdf;box-shadow:0 12px 35px #174a2a0a}
@@ -100,20 +100,22 @@ textarea::placeholder{color:#789584}
 <body>
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="logo">S</div><div class="brandname">Simple <span>AI</span></div><div class="version">v.0.0.2</div></div>
+    <div class="brand"><div class="logo">S</div><div class="brandname">Simple <span>AI</span></div><div class="version">v.0.0.3</div></div>
     <button class="newchat" id="newChat"><span>＋</span> گفت‌وگوی جدید</button>
     <div class="section-label">گفت‌وگوها</div>
     <div class="history-empty" id="historyEmpty">هنوز گفت‌وگویی ذخیره نشده.<br>اولین گفت‌وگوت رو شروع کن.</div>
     <div id="historyList"></div>
-    <div class="sidebar-bottom"><div class="status"><span class="dot"></span> نسخه اولیه آماده است</div><div>Simple AI · v.0.0.2</div><div>فعلاً فقط گفت‌وگوی متنی</div></div>
+    <div class="sidebar-bottom"><div class="status"><span class="dot"></span> اجرای مدل روی گوشی</div><div>Simple AI · v.0.0.3</div><div>گفت‌وگوی متنی محلی؛ بدون API ابری</div></div>
   </aside>
   <main class="main">
     <header class="topbar">
       <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
       <div class="mobile-brand"><div class="logo">S</div><span>Simple <span style="color:var(--green)">AI</span></span></div>
       <div class="top-title-wrap"><div class="top-title">گفت‌وگوی هوشمند</div><div class="top-sub">ساده، محترمانه، همراه تو</div></div>
-      <div class="top-spacer"></div><div class="version">v.0.0.2</div>
+      <div class="top-spacer"></div><div class="version">v.0.0.3</div>
+      <button class="chip" id="modelButton" type="button" style="padding:8px 10px">انتخاب مدل محلی</button>
     </header>
+    <div id="modelStatus" role="status" style="padding:9px 18px;background:#f1faf4;border-bottom:1px solid #dceee2;color:#286443;font-size:11px;line-height:1.8">برای شروع، فایل مدل محلی با پسوند .task را انتخاب کن. بعد از بارگذاری، چت روی گوشی اجرا می‌شود.</div>
     <section class="chat-area" id="chatArea">
       <div class="welcome" id="welcome">
         <div class="welcome-logo">S</div>
@@ -173,22 +175,56 @@ function renderHistory(){
   $('historyList').innerHTML=''; $('historyEmpty').style.display=conversations.length?'none':'block';
   conversations.slice().reverse().forEach((c,i)=>{const b=document.createElement('button');b.className='chip';b.style.width='100%';b.style.textAlign='right';b.style.marginBottom='7px';b.textContent=c.title;b.addEventListener('click',()=>{messages.innerHTML=c.html;welcome.style.display='none';currentTitle=c.title;$('sidebar').classList.remove('open');scrollBottom();});$('historyList').appendChild(b);});
 }
-function simpleDemoReply(message){
-  const m=message.toLowerCase();
-  if(/سلام|درود|hello|hi/.test(m)) return 'سلام! 🌿 خوشحالم که باهم گفت‌وگو می‌کنیم. چه چیزی توی ذهنته؟';
-  if(/اسم|معرفی|کی هستی|خودت/.test(m)) return 'من Simple هستم؛ یک دستیار گفت‌وگویی که با هدف پاسخ‌گویی محترمانه و کمک به یادگیری ساخته می‌شه. این نسخه v.0.0.2 هست و فعلاً رابط چت متنی رو داره. اتصال به مدل هوش مصنوعی آنلاین در مرحله بعد اضافه می‌شه.';
-  if(/برنامه.?نویسی|کد|جاوا|flutter|فلاتر/.test(m)) return 'حتماً، با کمال میل کمک می‌کنم. 😊 می‌تونیم موضوع رو به قدم‌های کوچیک تقسیم کنیم و هر مرحله رو باهم جلو ببریم. این نسخه آزمایشی هنوز به مدل آنلاین وصل نیست؛ برای پاسخ‌های هوشمند واقعی باید API رو در مرحله بعد متصل کنیم.';
-  if(/ممنون|مرسی|تشکر/.test(m)) return 'خواهش می‌کنم! 💚 هر وقت آماده بودی، ادامه می‌دیم.';
-  return 'پیامت رو دریافت کردم. 💚\n\nاین ظاهر اولیه Simple AI است و گفت‌وگوی متنی در آن آماده شده؛ اما هنوز به مدل هوش مصنوعی آنلاین متصل نیست، بنابراین فعلاً نمی‌تونه پاسخ هوشمند واقعی تولید کنه. مرحله بعدی، وصل کردن امن API است.';
+let activeLocalRequestId = null;
+let activeLocalBubble = null;
+function updateModelStatus(message){
+  $('modelStatus').textContent = message;
+}
+window.onLocalModelStatus = updateModelStatus;
+window.onLocalModelChunk = (requestId, chunk, done) => {
+  if(requestId !== activeLocalRequestId || !activeLocalBubble) return;
+  $('typingRow')?.remove();
+  activeLocalBubble.textContent += chunk;
+  scrollBottom();
+  if(done === 'true'){
+    setWaiting(false);
+    activeLocalRequestId = null;
+    activeLocalBubble = null;
+  }
+};
+window.onLocalModelError = (requestId, message) => {
+  if(requestId !== activeLocalRequestId) return;
+  setWaiting(false);
+  if(activeLocalBubble) activeLocalBubble.textContent = 'خطا: ' + message;
+  activeLocalRequestId = null;
+  activeLocalBubble = null;
+};
+$('modelButton').addEventListener('click',()=>{
+  if(window.SimpleLocalAI) window.SimpleLocalAI.selectModel();
+  else updateModelStatus('پل ارتباطی اندروید در دسترس نیست؛ لطفاً برنامه را دوباره باز کن.');
+});
+if(window.SimpleLocalAI){
+  updateModelStatus(window.SimpleLocalAI.getModelStatus());
 }
 async function sendMessage(){
   const text=input.value.trim(); if(!text||waiting)return;
+  if(!window.SimpleLocalAI){
+    addMessage('assistant','این نسخه باید در برنامه اندروید اجرا شود تا به موتور مدل محلی دسترسی داشته باشد.');
+    return;
+  }
+  if(!window.SimpleLocalAI.isModelReady()){
+    updateModelStatus('هنوز مدل آماده نیست. روی «انتخاب مدل محلی» بزن و یک فایل سازگار .task انتخاب کن.');
+    addMessage('assistant','برای پاسخ‌دادن، اول باید مدل هوش مصنوعی را روی گوشی بارگذاری کنیم. روی دکمه «انتخاب مدل محلی» بزن و فایل سازگار با MediaPipe با پسوند .task را انتخاب کن.');
+    return;
+  }
   if(!currentTitle)currentTitle=text.length>26?text.slice(0,26)+'…':text;
-  addMessage('user',text); input.value='';resizeInput();setWaiting(true);
-  // Safe local demo response. No API key is embedded in this client.
-  await new Promise(r=>setTimeout(r,550));
-  setWaiting(false);addMessage('assistant',simpleDemoReply(text));
+  addMessage('user',text); input.value='';resizeInput();
+  const row=addMessage('assistant','');
+  activeLocalBubble=row.querySelector('.bubble');
+  activeLocalRequestId=String(Date.now())+'-'+Math.random().toString(36).slice(2);
+  setWaiting(true);
   $('sidebar').classList.remove('open');
+  window.SimpleLocalAI.generate(text,activeLocalRequestId);
 }
 $('chatForm').addEventListener('submit',e=>{e.preventDefault();sendMessage();});
 </script>
