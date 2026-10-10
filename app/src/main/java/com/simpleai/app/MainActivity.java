@@ -115,6 +115,7 @@ public class MainActivity extends Activity {
         modelExecutor.execute(() -> {
             try {
                 LlmInference old = llmInference;
+                llmInference = null;
                 if (old != null) old.close();
                 LlmInference.LlmInferenceOptions options =
                         LlmInference.LlmInferenceOptions.builder()
@@ -128,6 +129,7 @@ public class MainActivity extends Activity {
                                     String message = "خطای مدل: " + safeMessage(error);
                                     modelStatus = message;
                                     sendJs("onLocalModelStatus", message);
+                                    sendJs("onLocalModelError", activeRequestId, message);
                                 })
                                 .build();
                 llmInference = LlmInference.createFromOptions(getApplicationContext(), options);
