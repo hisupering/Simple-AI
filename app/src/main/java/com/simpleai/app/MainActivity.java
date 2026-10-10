@@ -19,16 +19,19 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
-    private static final int PICK_MODEL_REQUEST = 4103;
+    private static final String MODEL_URL = "https://huggingface.co/litert-community/SmolLM-135M-Instruct/resolve/main/SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task";
     private WebView webView;
     private LlmInference llmInference;
     private final ExecutorService modelExecutor = Executors.newSingleThreadExecutor();
     private volatile boolean modelLoading = false;
-    private volatile String modelStatus = "برای شروع، فایل مدل .task را انتخاب کن.";
+    private volatile boolean modelDownloading = false;
+    private volatile String modelStatus = "در حال آماده‌سازی هوش مصنوعی محلی…";
     private volatile String activeRequestId = "";
     private File modelFile;
 
@@ -51,11 +54,13 @@ public class MainActivity extends Activity {
         setContentView(webView);
 
         modelFile = new File(getFilesDir(), "simpleai-model.task");
-        if (modelFile.exists() && modelFile.length() > 0) {
-            modelStatus = "فایل مدل ذخیره شده است؛ در حال آماده‌سازی…";
-            loadModel(modelFile);
-        }
         webView.loadUrl("file:///android_asset/index.html");
+        if (modelFile.exists() && modelFile.length() > 100000000) {
+            modelStatus = "مدل روی گوشی پیدا شد؛ در حال آماده‌سازی…";
+            loadModel(modelFile);
+        } else {
+            downloadModel();
+        }
     }
 
     private void sendJs(String function, String... args) {
@@ -71,38 +76,59 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void pickModel() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICK_MODEL_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != PICK_MODEL_REQUEST || resultCode != RESULT_OK || data == null || data.getData() == null) return;
-        Uri uri = data.getData();
-        modelStatus = "در حال کپی فایل مدل به حافظه برنامه…";
+    private void downloadModel() {
+        if (modelDownloading || modelLoading) return;
+        modelDownloading = true;
+        modelStatus = "در حال دریافت خودکار مدل هوش مصنوعی (حدود 167 مگابایت)…";
         sendJs("onLocalModelStatus", modelStatus);
         modelExecutor.execute(() -> {
             File temp = new File(getFilesDir(), "simpleai-model.tmp");
-            try (InputStream in = getContentResolver().openInputStream(uri);
-                 FileOutputStream out = new FileOutputStream(temp)) {
-                if (in == null) throw new IllegalStateException("فایل قابل خواندن نیست.");
-                byte[] buffer = new byte[1024 * 1024];
-                int count;
-                while ((count = in.read(buffer)) != -1) out.write(buffer, 0, count);
-                out.flush();
-                if (!temp.renameTo(modelFile)) {
-                    if (modelFile.exists()) modelFile.delete();
-                    if (!temp.renameTo(modelFile)) throw new IllegalStateException("کپی فایل مدل کامل نشد.");
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(MODEL_URL).openConnection();
+                connection.setConnectTimeout(20000);
+                connection.setReadTimeout(30000);
+                connection.setInstanceFollowRedirects(true);
+                connection.setRequestProperty("User-Agent", "SimpleAI-Android/0.0.3");
+                connection.connect();
+                int status = connection.getResponseCode();
+                if (status < 200 || status >= 300) {
+                    throw new IllegalStateException("سرور مدل پاسخ مناسب نداد (HTTP " + status + ").");
                 }
+                long total = connection.getContentLengthLong();
+                try (InputStream in = connection.getInputStream();
+                     FileOutputStream out = new FileOutputStream(temp)) {
+                    byte[] buffer = new byte[256 * 1024];
+                    int count;
+                    long received = 0;
+                    int lastPercent = -1;
+                    while ((count = in.read(buffer)) != -1) {
+                        received += count;
+                        out.write(buffer, 0, count);
+                        if (total > 0) {
+                            int percent = (int) (received * 100 / total);
+                            if (percent != lastPercent && percent % 5 == 0) {
+                                lastPercent = percent;
+                                modelStatus = "دریافت خودکار مدل: " + percent + "%";
+                                sendJs("onLocalModelStatus", modelStatus);
+                            }
+                        }
+                    }
+                    out.flush();
+                }
+                if (temp.length() < 100000000) {
+                    throw new IllegalStateException("فایل مدل ناقص است؛ اتصال اینترنت را بررسی کن و دوباره تلاش کن.");
+                }
+                if (modelFile.exists()) modelFile.delete();
+                if (!temp.renameTo(modelFile)) throw new IllegalStateException("ذخیره مدل در حافظه برنامه ناموفق بود.");
                 runOnUiThread(() -> loadModel(modelFile));
             } catch (Exception e) {
                 temp.delete();
-                modelStatus = "خواندن فایل مدل ناموفق بود: " + safeMessage(e);
+                modelStatus = "دریافت مدل انجام نشد. اینترنت را بررسی کن و برنامه را دوباره باز کن. " + safeMessage(e);
                 sendJs("onLocalModelStatus", modelStatus);
+            } finally {
+                if (connection != null) connection.disconnect();
+                modelDownloading = false;
             }
         });
     }
@@ -152,7 +178,7 @@ public class MainActivity extends Activity {
     private class LocalModelBridge {
         @JavascriptInterface
         public void selectModel() {
-            runOnUiThread(() -> pickModel());
+            downloadModel();
         }
 
         @JavascriptInterface
@@ -163,6 +189,11 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public boolean isModelReady() {
             return llmInference != null && !modelLoading;
+        }
+
+        @JavascriptInterface
+        public boolean isModelDownloading() {
+            return modelDownloading;
         }
 
         @JavascriptInterface
