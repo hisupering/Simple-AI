@@ -13,7 +13,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(7, 17, 13));
+        getWindow().setStatusBarColor(Color.rgb(255, 255, 255));
         getWindow().setNavigationBarColor(Color.rgb(7, 17, 13));
         getWindow().getDecorView().setSystemUiVisibility(0);
 
