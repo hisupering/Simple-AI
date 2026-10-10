@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,6 +36,8 @@ public class MainActivity extends Activity {
     private volatile String voiceLanguage = "en-US";
     private static final String MODEL_URL = "https://huggingface.co/litert-community/SmolLM-135M-Instruct/resolve/main/SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task";
     private WebView webView;
+    private TextToSpeech textToSpeech;
+    private volatile boolean ttsReady = false;
     private LlmInference llmInference;
     private final ExecutorService modelExecutor = Executors.newSingleThreadExecutor();
     private volatile boolean modelLoading = false;
@@ -59,6 +63,12 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient());
         webView.addJavascriptInterface(new LocalModelBridge(), "SimpleLocalAI");
         setContentView(webView);
+        textToSpeech = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS && textToSpeech != null) {
+                ttsReady = true;
+                textToSpeech.setLanguage(Locale.US);
+            }
+        });
 
         modelFile = new File(getFilesDir(), "simpleai-model.task");
         webView.loadUrl("file:///android_asset/index.html");
@@ -189,6 +199,26 @@ public class MainActivity extends Activity {
         }
     }
 
+    private Locale localeObjectForLanguage(String language) {
+        return Locale.forLanguageTag(localeForLanguage(language));
+    }
+
+    private void speakText(String text, String language) {
+        runOnUiThread(() -> {
+            if (textToSpeech == null || !ttsReady) {
+                sendJs("onVoiceStatus", "Text-to-speech is still starting. Try again in a moment.");
+                return;
+            }
+            Locale locale = localeObjectForLanguage(language);
+            int availability = textToSpeech.setLanguage(locale);
+            if (availability == TextToSpeech.LANG_MISSING_DATA || availability == TextToSpeech.LANG_NOT_SUPPORTED) {
+                sendJs("onVoiceStatus", "A speech voice for this language is not installed on this device.");
+                return;
+            }
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "simple-ai-answer");
+        });
+    }
+
     private void beginVoiceInput() {
         try {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -231,6 +261,11 @@ public class MainActivity extends Activity {
     }
 
     private class LocalModelBridge {
+        @JavascriptInterface
+        public void speakResponse(String text, String language) {
+            if (text != null && !text.trim().isEmpty()) speakText(text, language);
+        }
+
         @JavascriptInterface
         public void setVoiceLanguage(String language) {
             voiceLanguage = localeForLanguage(language);
@@ -291,6 +326,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (textToSpeech != null) {
+            try { textToSpeech.stop(); textToSpeech.shutdown(); } catch (Exception ignored) {}
+            textToSpeech = null;
+        }
         if (llmInference != null) {
             try { llmInference.close(); } catch (Exception ignored) {}
             llmInference = null;
