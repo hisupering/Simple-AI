@@ -147,17 +147,7 @@ public class MainActivity extends Activity {
                         LlmInference.LlmInferenceOptions.builder()
                                 .setModelPath(file.getAbsolutePath())
                                 .setMaxTokens(512)
-                                .setResultListener((partialResult, done) -> {
-                                    // Partial chunks are streamed to the chat UI.
-                                    sendJs("onLocalModelChunk", activeRequestId, partialResult, done ? "true" : "false");
-                                })
-                                .setErrorListener(error -> {
-                                    String message = "خطای مدل: " + safeMessage(error);
-                                    modelStatus = message;
-                                    sendJs("onLocalModelStatus", message);
-                                    sendJs("onLocalModelError", activeRequestId, message);
-                                })
-                                .build();
+.build();
                 llmInference = LlmInference.createFromOptions(getApplicationContext(), options);
                 modelStatus = "مدل محلی آماده است؛ پاسخ‌ها روی همین گوشی تولید می‌شوند.";
                 sendJs("onLocalModelStatus", modelStatus);
@@ -208,7 +198,8 @@ public class MainActivity extends Activity {
                 try {
                     String formatted = "<start_of_turn>user\n" + prompt
                             + "\n<end_of_turn>\n<start_of_turn>model\n";
-                    engine.generateResponseAsync(formatted);
+                    String response = engine.generateResponse(formatted);
+                    sendJs("onLocalModelChunk", requestId, response, "true");
                 } catch (Exception e) {
                     sendJs("onLocalModelError", requestId, safeMessage(e));
                 }
