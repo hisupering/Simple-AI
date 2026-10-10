@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
                 connection.setConnectTimeout(20000);
                 connection.setReadTimeout(30000);
                 connection.setInstanceFollowRedirects(true);
-                connection.setRequestProperty("User-Agent", "SimpleAI-Android/0.0.3");
+                connection.setRequestProperty("User-Agent", "SimpleAI-Android/0.0.5");
                 connection.connect();
                 int status = connection.getResponseCode();
                 if (status < 200 || status >= 300) {
@@ -164,7 +164,7 @@ public class MainActivity extends Activity {
                         LlmInference.LlmInferenceOptions.builder()
                                 .setModelPath(file.getAbsolutePath())
                                 .setMaxTokens(512)
-.build();
+                                .build();
                 llmInference = LlmInference.createFromOptions(getApplicationContext(), options);
                 modelStatus = "Local AI is ready. Responses are generated on this device.";
                 sendJs("onLocalModelStatus", modelStatus);
@@ -225,6 +225,7 @@ public class MainActivity extends Activity {
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguage);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, voiceLanguage);
+            intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your message");
             startActivityForResult(intent, VOICE_REQUEST_CODE);
         } catch (ActivityNotFoundException e) {
@@ -313,7 +314,7 @@ public class MainActivity extends Activity {
                     return;
                 }
                 try {
-                    String formatted = "<|im_start|>system\nYou are Simple AI, a helpful multilingual assistant. Always answer in the same language as the user\u0027s latest message unless they explicitly ask for another language. Understand and respond in any language you can. Keep your tone clear, friendly, and respectful.\n<|im_end|>\n<|im_start|>user\n" + prompt
+                    String formatted = "<|im_start|>system\nYou are Simple AI, a helpful multilingual assistant. Always answer in the same language as the user's latest message unless they explicitly ask for another language. Understand and respond in any language you can. Keep your tone clear, friendly, and respectful.\n<|im_end|>\n<|im_start|>user\n" + prompt
                             + "\n<|im_end|>\n<|im_start|>assistant\n";
                     String response = engine.generateResponse(formatted);
                     sendJs("onLocalModelChunk", requestId, response, "true");
