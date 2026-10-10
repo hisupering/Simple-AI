@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
                         if (existing > 0) connection.setRequestProperty("Range", "bytes=" + existing + "-");
                         connection.connect();
                         int status = connection.getResponseCode();
-                        if (status == HttpURLConnection.HTTP_REQUESTED_RANGE_NOT_SATISFIABLE && existing > 100000000L) {
+                        if (status == 416 && existing > 100000000L) {
                             complete = true;
                             break;
                         }
