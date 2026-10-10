@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07110d">
+<title>Simple AI — v.0.0.1</title>
+<style>
+:root{--bg:#07110d;--panel:#0b1711;--panel2:#101f17;--line:#20382a;--green:#39e58c;--green2:#18b968;--text:#edf8f1;--muted:#91a99a;--user:#123b29;--shadow:0 24px 80px #0007}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -20%,#17472d 0,transparent 45%),var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",Arial,sans-serif;min-height:100vh}
+button,input,textarea{font:inherit}
+.app{min-height:100vh;display:flex;max-width:1600px;margin:auto;padding:18px;gap:16px}
+.sidebar{width:258px;flex-shrink:0;background:#09140e;border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#4af5a0,#12824b);color:#03140a;font-size:24px;font-weight:900;box-shadow:0 8px 24px #23d77a2a}
+.brandname{font-size:19px;font-weight:800;letter-spacing:.2px}.brandname span{color:var(--green)}
+.version{font-size:11px;color:#8fb39b;border:1px solid #244b34;background:#10251a;border-radius:7px;padding:4px 7px;margin-right:auto;direction:ltr}
+.newchat{display:flex;justify-content:center;align-items:center;gap:9px;border:1px solid #28784a;background:#123d28;color:#dfffee;border-radius:13px;padding:12px;cursor:pointer;transition:.2s}
+.newchat:hover{background:#185234;transform:translateY(-1px)}
+.section-label{font-size:11px;color:#73917d;margin:4px 4px 0}
+.history-empty{font-size:12px;line-height:1.9;color:#718a79;padding:12px 8px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px;line-height:1.9}
+.status{display:flex;align-items:center;gap:7px;color:#a9c7b3}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #39e58c88}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#0b1711f5,#07100cf7);box-shadow:var(--shadow)}
+.topbar{height:68px;border-bottom:1px solid #1b3023;display:flex;align-items:center;padding:0 24px;gap:12px}
+.mobile-brand{display:none;align-items:center;gap:8px;font-weight:800}.mobile-brand .logo{width:32px;height:32px;border-radius:10px;font-size:18px}
+.top-title{font-size:14px;font-weight:700}.top-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.top-spacer{flex:1}
+.chat-area{flex:1;overflow:auto;padding:34px 20px 24px}
+.welcome{max-width:660px;margin:7vh auto 0;text-align:center}
+.welcome-logo{width:72px;height:72px;margin:0 auto 20px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(145deg,#43f49a,#127747);color:#04150a;font-weight:900;font-size:38px;box-shadow:0 0 60px #29d97725}
+.welcome h1{font-size:clamp(27px,4vw,42px);margin:0 0 13px;letter-spacing:-1px}.welcome h1 span{color:var(--green)}
+.welcome p{color:#9bb3a2;line-height:2;font-size:14px;margin:0 auto;max-width:460px}
+.chips{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:25px}
+.chip{border:1px solid #234431;color:#a9c8b4;background:#0e2016;padding:9px 12px;border-radius:12px;font-size:12px;cursor:pointer;transition:.2s}
+.chip:hover{border-color:#39e58c;color:#e9fff1;background:#123321}
+.messages{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.message{display:flex;gap:10px;align-items:flex-start;max-width:88%;animation:up .2s ease}
+.message.user{align-self:flex-start;flex-direction:row-reverse}
+.message.assistant{align-self:flex-end}
+.avatar{width:31px;height:31px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;font-size:12px;font-weight:800;background:#123d28;color:var(--green);border:1px solid #285b3d}
+.user .avatar{background:#1b3427;color:#d3f9e2;border-color:#345943}
+.bubble{border:1px solid #20392a;background:#0d1b13;border-radius:16px 5px 16px 16px;padding:13px 15px;line-height:1.95;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.user .bubble{background:#123b29;border-color:#245a3d;border-radius:5px 16px 16px 16px}
+.typing{display:flex;gap:5px;padding:5px 2px}.typing i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.composer-wrap{padding:0 20px 15px}
+.composer{max-width:820px;margin:auto;border:1px solid #2a4a35;border-radius:18px;background:#0b1a11;padding:9px 10px 9px 12px;display:flex;align-items:flex-end;gap:10px;box-shadow:0 10px 35px #0003;transition:.2s}
+.composer:focus-within{border-color:#39b976;box-shadow:0 0 0 3px #39e58c12}
+textarea{flex:1;min-width:0;max-height:160px;resize:none;border:0;outline:0;background:transparent;color:var(--text);padding:9px 5px;line-height:1.7;font-size:14px}
+textarea::placeholder{color:#6e8c78}
+.send{width:42px;height:42px;flex-shrink:0;border:0;border-radius:13px;background:linear-gradient(145deg,#48f29a,#16a85e);color:#052012;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.send:hover{filter:brightness(1.08);transform:translateY(-1px)}.send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.footnote{text-align:center;font-size:10px;color:#607a68;padding:0 12px 12px}
+.menu-toggle{display:none;background:transparent;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:7px 9px}
+@keyframes pulse{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+.app{padding:0;gap:0}.main{border-radius:0;border:0;min-height:100dvh}.sidebar{position:fixed;z-index:5;top:10px;bottom:10px;right:10px;width:min(290px,calc(100vw - 40px));box-shadow:var(--shadow);transform:translateX(calc(100% + 20px));transition:transform .22s ease}.sidebar.open{transform:translateX(0)}
+.topbar{height:60px;padding:0 14px}.mobile-brand{display:flex}.top-title-wrap{display:none}.menu-toggle{display:block}.version{font-size:10px}
+.chat-area{padding:22px 13px 20px}.welcome{margin-top:9vh}.welcome-logo{width:62px;height:62px;border-radius:21px;font-size:32px}.welcome p{font-size:13px}.chips{gap:7px}.chip{font-size:11px;padding:8px 10px}
+.message{max-width:96%}.bubble{font-size:13px;padding:11px 12px}.composer-wrap{padding:0 10px 10px}.composer{border-radius:16px}.footnote{font-size:9px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">S</div><div class="brandname">Simple <span>AI</span></div><div class="version">v.0.0.1</div></div>
+    <button class="newchat" id="newChat"><span>＋</span> گفت‌وگوی جدید</button>
+    <div class="section-label">گفت‌وگوها</div>
+    <div class="history-empty" id="historyEmpty">هنوز گفت‌وگویی ذخیره نشده.<br>اولین گفت‌وگوت رو شروع کن.</div>
+    <div id="historyList"></div>
+    <div class="sidebar-bottom"><div class="status"><span class="dot"></span> نسخه اولیه آماده است</div><div>Simple AI · v.0.0.1</div><div>فعلاً فقط گفت‌وگوی متنی</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
+      <div class="mobile-brand"><div class="logo">S</div><span>Simple <span style="color:var(--green)">AI</span></span></div>
+      <div class="top-title-wrap"><div class="top-title">گفت‌وگوی هوشمند</div><div class="top-sub">ساده، محترمانه، همراه تو</div></div>
+      <div class="top-spacer"></div><div class="version">v.0.0.1</div>
+    </header>
+    <section class="chat-area" id="chatArea">
+      <div class="welcome" id="welcome">
+        <div class="welcome-logo">S</div>
+        <h1>سلام، من <span>Simple</span> هستم.</h1>
+        <p>خوش اومدی! من اینجام تا با احترام باهات گفت‌وگو کنم، به پرسش‌هات جواب بدم و در فکر کردن و یادگیری کمکت کنم.</p>
+        <div class="chips">
+          <button class="chip" data-prompt="خودت رو معرفی کن">معرفی خودت</button>
+          <button class="chip" data-prompt="می‌تونی در یادگیری برنامه‌نویسی کمکم کنی؟">یادگیری برنامه‌نویسی</button>
+          <button class="chip" data-prompt="امروز درباره چی می‌تونیم صحبت کنیم؟">شروع یک گفت‌وگو</button>
+        </div>
+      </div>
+      <div class="messages" id="messages"></div>
+    </section>
+    <div class="composer-wrap">
+      <form class="composer" id="chatForm">
+        <textarea id="messageInput" rows="1" placeholder="پیامت رو برای Simple بنویس..." aria-label="پیام" maxlength="6000"></textarea>
+        <button class="send" id="sendButton" type="submit" aria-label="ارسال پیام" title="ارسال">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+    </div>
+    <div class="footnote">Simple می‌تونه اشتباه کنه؛ برای اطلاعات مهم، پاسخ‌ها رو بررسی کن.</div>
+  </main>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const input = $('messageInput'), messages = $('messages'), welcome = $('welcome');
+let currentTitle = '';
+let conversations = [];
+let waiting = false;
+
+function resizeInput(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px'; }
+input.addEventListener('input', resizeInput);
+input.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){e.preventDefault(); $('chatForm').requestSubmit();} });
+$('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+$('newChat').addEventListener('click', resetChat);
+document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.prompt;resizeInput();sendMessage();}));
+
+function addMessage(role, text){
+  welcome.style.display='none';
+  const row=document.createElement('div'); row.className='message '+role;
+  const avatar=document.createElement('div'); avatar.className='avatar'; avatar.textContent=role==='user'?'ش':'S';
+  const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text;
+  row.append(avatar,bubble); messages.appendChild(row); scrollBottom(); return row;
+}
+function scrollBottom(){ $('chatArea').scrollTop=$('chatArea').scrollHeight; }
+function setWaiting(on){
+  waiting=on; $('sendButton').disabled=on;
+  const old=$('typingRow'); if(old)old.remove();
+  if(on){const row=document.createElement('div');row.id='typingRow';row.className='message assistant';row.innerHTML='<div class="avatar">S</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>';messages.appendChild(row);scrollBottom();}
+}
+function resetChat(){
+  if(messages.children.length){conversations.push({title:currentTitle||'گفت‌وگوی جدید',html:messages.innerHTML});renderHistory();}
+  messages.innerHTML='';welcome.style.display='block';currentTitle='';input.value='';resizeInput();$('sidebar').classList.remove('open');input.focus();
+}
+function renderHistory(){
+  $('historyList').innerHTML=''; $('historyEmpty').style.display=conversations.length?'none':'block';
+  conversations.slice().reverse().forEach((c,i)=>{const b=document.createElement('button');b.className='chip';b.style.width='100%';b.style.textAlign='right';b.style.marginBottom='7px';b.textContent=c.title;b.addEventListener('click',()=>{messages.innerHTML=c.html;welcome.style.display='none';currentTitle=c.title;$('sidebar').classList.remove('open');scrollBottom();});$('historyList').appendChild(b);});
+}
+function simpleDemoReply(message){
+  const m=message.toLowerCase();
+  if(/سلام|درود|hello|hi/.test(m)) return 'سلام! 🌿 خوشحالم که باهم گفت‌وگو می‌کنیم. چه چیزی توی ذهنته؟';
+  if(/اسم|معرفی|کی هستی|خودت/.test(m)) return 'من Simple هستم؛ یک دستیار گفت‌وگویی که با هدف پاسخ‌گویی محترمانه و کمک به یادگیری ساخته می‌شه. این نسخه v.0.0.1 هست و فعلاً رابط چت متنی رو داره. اتصال به مدل هوش مصنوعی آنلاین در مرحله بعد اضافه می‌شه.';
+  if(/برنامه.?نویسی|کد|جاوا|flutter|فلاتر/.test(m)) return 'حتماً، با کمال میل کمک می‌کنم. 😊 می‌تونیم موضوع رو به قدم‌های کوچیک تقسیم کنیم و هر مرحله رو باهم جلو ببریم. این نسخه آزمایشی هنوز به مدل آنلاین وصل نیست؛ برای پاسخ‌های هوشمند واقعی باید API رو در مرحله بعد متصل کنیم.';
+  if(/ممنون|مرسی|تشکر/.test(m)) return 'خواهش می‌کنم! 💚 هر وقت آماده بودی، ادامه می‌دیم.';
+  return 'پیامت رو دریافت کردم. 💚\n\nاین ظاهر اولیه Simple AI است و گفت‌وگوی متنی در آن آماده شده؛ اما هنوز به مدل هوش مصنوعی آنلاین متصل نیست، بنابراین فعلاً نمی‌تونه پاسخ هوشمند واقعی تولید کنه. مرحله بعدی، وصل کردن امن API است.';
+}
+async function sendMessage(){
+  const text=input.value.trim(); if(!text||waiting)return;
+  if(!currentTitle)currentTitle=text.length>26?text.slice(0,26)+'…':text;
+  addMessage('user',text); input.value='';resizeInput();setWaiting(true);
+  // Safe local demo response. No API key is embedded in this client.
+  await new Promise(r=>setTimeout(r,550));
+  setWaiting(false);addMessage('assistant',simpleDemoReply(text));
+  $('sidebar').classList.remove('open');
+}
+$('chatForm').addEventListener('submit',e=>{e.preventDefault();sendMessage();});
+</script>
+</body>
+</html>
