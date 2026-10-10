@@ -1,232 +1,117 @@
 <!doctype html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<title>Simple AI — v.0.0.3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5fbf7">
+<title>Simple AI — v0.0.4</title>
 <style>
-:root{--bg:#07110d;--panel:#0b1711;--panel2:#101f17;--line:#20382a;--green:#39e58c;--green2:#18b968;--text:#edf8f1;--muted:#91a99a;--user:#123b29;--shadow:0 24px 80px #0007}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 50% -20%,#17472d 0,transparent 45%),var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",Arial,sans-serif;min-height:100vh}
-button,input,textarea{font:inherit}
-.app{min-height:100vh;display:flex;max-width:1600px;margin:auto;padding:18px;gap:16px}
-.sidebar{width:258px;flex-shrink:0;background:#09140e;border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:18px}
-.brand{display:flex;align-items:center;gap:11px}
-.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#4af5a0,#12824b);color:#03140a;font-size:24px;font-weight:900;box-shadow:0 8px 24px #23d77a2a}
-.brandname{font-size:19px;font-weight:800;letter-spacing:.2px}.brandname span{color:var(--green)}
-.version{font-size:11px;color:#8fb39b;border:1px solid #244b34;background:#10251a;border-radius:7px;padding:4px 7px;margin-right:auto;direction:ltr}
-.newchat{display:flex;justify-content:center;align-items:center;gap:9px;border:1px solid #28784a;background:#123d28;color:#dfffee;border-radius:13px;padding:12px;cursor:pointer;transition:.2s}
-.newchat:hover{background:#185234;transform:translateY(-1px)}
-.section-label{font-size:11px;color:#73917d;margin:4px 4px 0}
-.history-empty{font-size:12px;line-height:1.9;color:#718a79;padding:12px 8px}
-.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:12px;line-height:1.9}
-.status{display:flex;align-items:center;gap:7px;color:#a9c7b3}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #39e58c88}
-.main{flex:1;min-width:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#0b1711f5,#07100cf7);box-shadow:var(--shadow)}
-.topbar{height:68px;border-bottom:1px solid #1b3023;display:flex;align-items:center;padding:0 24px;gap:12px}
-.mobile-brand{display:none;align-items:center;gap:8px;font-weight:800}.mobile-brand .logo{width:32px;height:32px;border-radius:10px;font-size:18px}
-.top-title{font-size:14px;font-weight:700}.top-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.top-spacer{flex:1}
-.chat-area{flex:1;overflow:auto;padding:34px 20px 24px}
-.welcome{max-width:660px;margin:7vh auto 0;text-align:center}
-.welcome-logo{width:72px;height:72px;margin:0 auto 20px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(145deg,#43f49a,#127747);color:#04150a;font-weight:900;font-size:38px;box-shadow:0 0 60px #29d97725}
-.welcome h1{font-size:clamp(27px,4vw,42px);margin:0 0 13px;letter-spacing:-1px}.welcome h1 span{color:var(--green)}
-.welcome p{color:#9bb3a2;line-height:2;font-size:14px;margin:0 auto;max-width:460px}
-.chips{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:25px}
-.chip{border:1px solid #234431;color:#a9c8b4;background:#0e2016;padding:9px 12px;border-radius:12px;font-size:12px;cursor:pointer;transition:.2s}
-.chip:hover{border-color:#39e58c;color:#e9fff1;background:#123321}
-.messages{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.message{display:flex;gap:10px;align-items:flex-start;max-width:88%;animation:up .2s ease}
-.message.user{align-self:flex-start;flex-direction:row-reverse}
-.message.assistant{align-self:flex-end}
-.avatar{width:31px;height:31px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;font-size:12px;font-weight:800;background:#123d28;color:var(--green);border:1px solid #285b3d}
-.user .avatar{background:#1b3427;color:#d3f9e2;border-color:#345943}
-.bubble{border:1px solid #20392a;background:#0d1b13;border-radius:16px 5px 16px 16px;padding:13px 15px;line-height:1.95;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
-.user .bubble{background:#123b29;border-color:#245a3d;border-radius:5px 16px 16px 16px}
-.typing{display:flex;gap:5px;padding:5px 2px}.typing i{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
-.composer-wrap{padding:0 20px 15px}
-.composer{max-width:820px;margin:auto;border:1px solid #2a4a35;border-radius:18px;background:#0b1a11;padding:9px 10px 9px 12px;display:flex;align-items:flex-end;gap:10px;box-shadow:0 10px 35px #0003;transition:.2s}
-.composer:focus-within{border-color:#39b976;box-shadow:0 0 0 3px #39e58c12}
-textarea{flex:1;min-width:0;max-height:160px;resize:none;border:0;outline:0;background:transparent;color:var(--text);padding:9px 5px;line-height:1.7;font-size:14px}
-textarea::placeholder{color:#6e8c78}
-.send{width:42px;height:42px;flex-shrink:0;border:0;border-radius:13px;background:linear-gradient(145deg,#48f29a,#16a85e);color:#052012;display:grid;place-items:center;cursor:pointer;transition:.2s}
-.send:hover{filter:brightness(1.08);transform:translateY(-1px)}.send:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.footnote{text-align:center;font-size:10px;color:#607a68;padding:0 12px 12px}
-.menu-toggle{display:none;background:transparent;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:7px 9px}
-@keyframes pulse{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:760px){
-.app{padding:0;gap:0}.main{border-radius:0;border:0;min-height:100dvh}.sidebar{position:fixed;z-index:5;top:10px;bottom:10px;right:10px;width:min(290px,calc(100vw - 40px));box-shadow:var(--shadow);transform:translateX(calc(100% + 20px));transition:transform .22s ease}.sidebar.open{transform:translateX(0)}
-.topbar{height:60px;padding:0 14px}.mobile-brand{display:flex}.top-title-wrap{display:none}.menu-toggle{display:block}.version{font-size:10px}
-.chat-area{padding:22px 13px 20px}.welcome{margin-top:9vh}.welcome-logo{width:62px;height:62px;border-radius:21px;font-size:32px}.welcome p{font-size:13px}.chips{gap:7px}.chip{font-size:11px;padding:8px 10px}
-.message{max-width:96%}.bubble{font-size:13px;padding:11px 12px}.composer-wrap{padding:0 10px 10px}.composer{border-radius:16px}.footnote{font-size:9px}
-}
-
-/* v0.0.3 — bright green and white theme */
-:root{--bg:#f5fbf7;--panel:#ffffff;--panel2:#effaf3;--line:#d6ebdd;--green:#0b9f55;--green2:#087f45;--text:#163b27;--muted:#5f7d6a;--user:#e5f7ec;--shadow:0 18px 50px #164c2a12}
-body{background:linear-gradient(180deg,#eaf8ef 0,#ffffff 38%,#f7fcf8 100%);color:var(--text)}
-.sidebar{background:#ffffff;border-color:#d8ecdf;box-shadow:0 12px 35px #174a2a0a}
-.logo,.welcome-logo{background:linear-gradient(145deg,#27c66d,#078143);color:#ffffff;box-shadow:0 8px 25px #16a05b22}
-.brandname span,.welcome h1 span{color:#0a9b50}
-.version{color:#087a40;border-color:#bfe5cd;background:#eaf8ef}
-.newchat{border-color:#0b9f55;background:#0b9f55;color:#ffffff}
-.newchat:hover{background:#087f45}
-.section-label{color:#648873}
-.history-empty{color:#789382}
-.sidebar-bottom{border-color:#dceee2;color:#65816e}
-.status{color:#2d7048}
-.dot{background:#18b866;box-shadow:0 0 10px #18b86644}
-.main{border-color:#d8ecdf;background:#ffffff;box-shadow:0 18px 60px #174a2a0b}
-.topbar{border-color:#e0eee5;background:#ffffff}
-.top-sub{color:#698674}
-.welcome p{color:#5e7b69}
-.chip{border-color:#cfe7d7;color:#286443;background:#f1faf4}
-.chip:hover{border-color:#0b9f55;color:#075b31;background:#e2f6e9}
-.avatar{background:#e4f7eb;color:#078344;border-color:#bce4ca}
-.user .avatar{background:#d5f1df;color:#12643a;border-color:#b1dfc0}
-.bubble{border-color:#dcece2;background:#f7fcf8;color:#193e29}
-.user .bubble{background:#e4f7eb;border-color:#c4e8d0;color:#163b27}
-.composer{border-color:#cfe6d7;background:#ffffff;box-shadow:0 10px 30px #174a2a0a}
-.composer:focus-within{border-color:#18a85b;box-shadow:0 0 0 3px #18a85b12}
-textarea{color:#163b27}
-textarea::placeholder{color:#789584}
-.send{background:linear-gradient(145deg,#2bd875,#0a994f);color:#ffffff}
-.footnote{color:#789182}
-.menu-toggle{border-color:#d6ebdd;color:#21583a}
-@media(max-width:760px){.sidebar{background:#ffffff;box-shadow:0 20px 50px #174a2a20}}
-
+:root{color-scheme:light;--green:#0a9f58;--green2:#087c43;--ink:#173b29;--muted:#708879;--line:#dfede4;--soft:#f3faf5;--shadow:0 18px 60px #123c2410}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#d8f7e3 0,transparent 46%),#f7fbf8;color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,textarea,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;min-height:100vh;margin:auto;padding:16px;display:flex;gap:16px}
+.sidebar{width:260px;flex-shrink:0;border:1px solid var(--line);border-radius:24px;background:#ffffffdf;backdrop-filter:blur(18px);padding:18px;display:flex;flex-direction:column;gap:20px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:11px}.logo{height:42px;width:42px;display:grid;place-items:center;border-radius:15px;color:#fff;font-size:23px;font-weight:900;background:linear-gradient(145deg,#2bdc80,#078344);box-shadow:0 8px 22px #10a45b26}.brand-name{font-size:19px;font-weight:850;letter-spacing:-.6px}.brand-name span{color:var(--green)}.version{font-size:10px;color:#087c43;border:1px solid #ccebd7;background:#effaf3;padding:5px 7px;border-radius:8px;margin-left:auto;white-space:nowrap}
+.new-chat{display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:14px;padding:13px;background:linear-gradient(120deg,#13b968,#07864a);color:white;font-weight:750;box-shadow:0 8px 18px #0a9f5820;transition:.18s}.new-chat:hover{transform:translateY(-1px);filter:brightness(1.04)}
+.section-label{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#829889;padding:0 4px}.history-empty{font-size:12px;color:#8a9d90;line-height:1.7;padding:4px}.history-list{display:grid;gap:7px}.history-item{border:1px solid transparent;background:transparent;text-align:left;padding:10px;border-radius:11px;color:#4c6d59;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.history-item:hover{background:var(--soft);border-color:var(--line)}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:15px;font-size:11px;color:#819588;line-height:1.9}.status{display:flex;align-items:center;gap:7px;color:#287b4c;font-weight:700}.dot{width:7px;height:7px;background:#1db96b;border-radius:50%;box-shadow:0 0 0 4px #1db96b18;flex-shrink:0}
+.main{flex:1;min-width:0;min-height:calc(100vh - 32px);border:1px solid var(--line);border-radius:24px;background:#ffffffeb;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.topbar{min-height:72px;display:flex;align-items:center;gap:13px;padding:12px 22px;border-bottom:1px solid #eaf2ec}.menu-toggle{display:none;border:1px solid var(--line);background:white;color:var(--ink);border-radius:11px;padding:8px 10px}.mobile-brand{display:none;align-items:center;gap:8px;font-weight:850}.mobile-brand .logo{height:32px;width:32px;border-radius:11px;font-size:17px}.top-title{font-size:14px;font-weight:800}.top-sub{font-size:11px;color:var(--muted);margin-top:4px}.spacer{flex:1}
+.model-pill{display:flex;align-items:center;gap:8px;border:1px solid #d7efdf;background:#f2fbf5;color:#28774a;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:700;max-width:35%;overflow:hidden}.model-pill span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.language-select{max-width:125px;border:1px solid #d5e9dc;background:#fff;color:#35684a;border-radius:12px;padding:9px 10px;font-size:11px;font-weight:750;outline:none}.language-select:focus{border-color:#70c990;box-shadow:0 0 0 3px #0a9f5810}.model-button{border:1px solid #cfe9d8;background:white;color:#28774a;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:750}.model-button:hover{background:#f1faf4}
+.model-status{padding:9px 20px;background:#f5fbf6;border-bottom:1px solid #e5f1e8;color:#568065;font-size:11px;line-height:1.6}
+.chat-area{flex:1;overflow:auto;padding:30px 22px 26px}.welcome{max-width:700px;margin:6vh auto 0;text-align:center}.hero-icon{width:78px;height:78px;border-radius:26px;margin:0 auto 22px;display:grid;place-items:center;background:linear-gradient(145deg,#2bdf80,#078344);color:white;box-shadow:0 16px 40px #10a45b2b}.hero-icon svg{width:36px;height:36px}.eyebrow{color:#17874d;font-size:10px;font-weight:850;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}.welcome h1{font-size:clamp(30px,4.5vw,48px);line-height:1.08;letter-spacing:-2px;margin:0 0 15px;font-weight:850}.welcome h1 span{color:var(--green)}.welcome p{max-width:470px;margin:0 auto;color:#71897a;font-size:14px;line-height:1.8}
+.chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:30px auto 0;max-width:680px}.chip{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:98px;padding:15px;border:1px solid #e0eee5;border-radius:16px;background:#fff;color:#315941;text-align:left;font-size:12px;line-height:1.45;transition:.18s}.chip:hover{border-color:#9ed9b4;background:#f8fdf9;transform:translateY(-2px)}.chip-icon{height:30px;width:30px;border-radius:10px;display:grid;place-items:center;background:#eaf8ef;color:#0a9f58;font-size:16px}
+.messages{max-width:850px;margin:0 auto;display:flex;flex-direction:column;gap:18px}.message{display:flex;gap:10px;align-items:flex-start;max-width:90%;animation:up .2s ease}.message.user{align-self:flex-end;flex-direction:row-reverse}.message.assistant{align-self:flex-start}.avatar{width:34px;height:34px;flex-shrink:0;border-radius:12px;display:grid;place-items:center;font-size:12px;font-weight:900;background:#e5f8ec;color:#0a9f58;border:1px solid #d3efdd}.user .avatar{background:#d5f1df;color:#17613b}.bubble{border:1px solid #e0eee5;background:#f8fcf9;border-radius:5px 17px 17px 17px;padding:13px 16px;line-height:1.75;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:#e8f8ee;border-color:#d0eedb;border-radius:17px 5px 17px 17px}.typing{display:flex;gap:5px;padding:6px 2px}.typing i{width:6px;height:6px;border-radius:50%;background:#18ad61;animation:pulse 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.composer-wrap{padding:0 22px 14px}.composer{max-width:850px;margin:auto;display:flex;align-items:flex-end;gap:9px;padding:9px;border:1px solid #d8eade;background:white;border-radius:20px;box-shadow:0 8px 30px #123c2408;transition:.2s}.composer:focus-within{border-color:#83d3a1;box-shadow:0 0 0 4px #0a9f580b}textarea{flex:1;min-width:0;max-height:150px;resize:none;border:0;outline:0;background:transparent;color:var(--ink);padding:10px 7px;line-height:1.65;font-size:14px}textarea::placeholder{color:#9aada0}.icon-button{height:43px;width:43px;flex-shrink:0;display:grid;place-items:center;border-radius:14px;border:1px solid #e0eee5;background:#f7fcf8;color:#548268;transition:.18s}.icon-button:hover{background:#eaf8ef;color:#0a9f58;border-color:#bfe6cc}.icon-button svg{width:19px;height:19px}.icon-button.recording{background:#fff0ef;border-color:#ffc8c4;color:#d83b36;animation:recordPulse 1.2s infinite}.send{height:43px;width:46px;flex-shrink:0;border:0;border-radius:14px;background:linear-gradient(145deg,#2bdc80,#07904e);color:#fff;display:grid;place-items:center;box-shadow:0 6px 15px #0a9f5820}.send:hover{filter:brightness(1.05);transform:translateY(-1px)}.send:disabled{opacity:.45;cursor:not-allowed}.footnote{text-align:center;font-size:10px;color:#9aaca0;padding:0 12px 13px}.overlay{display:none}
+@keyframes pulse{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes recordPulse{50%{box-shadow:0 0 0 5px #ff51451a}}
+@media(max-width:780px){.app{padding:0;gap:0}.main{border:0;border-radius:0;min-height:100dvh}.sidebar{position:fixed;z-index:8;top:9px;bottom:9px;left:9px;width:min(290px,calc(100vw - 40px));transform:translateX(calc(-100% - 20px));transition:transform .22s ease;box-shadow:0 20px 70px #123c2430}.sidebar.open{transform:translateX(0)}.overlay.show{display:block;position:fixed;z-index:7;inset:0;background:#123c2433;backdrop-filter:blur(2px)}.topbar{min-height:62px;padding:9px 12px;gap:7px}.menu-toggle{display:block}.mobile-brand{display:flex}.top-title-wrap{display:none}.model-pill{max-width:25%;padding:8px}.language-select{max-width:94px;padding:8px 5px;font-size:10px}.model-button{padding:8px 7px;font-size:10px}.chat-area{padding:24px 13px 20px}.welcome{margin-top:7vh}.hero-icon{height:65px;width:65px;border-radius:22px;margin-bottom:19px}.welcome h1{letter-spacing:-1.4px}.welcome p{font-size:13px}.chips{grid-template-columns:1fr;gap:8px;margin-top:24px}.chip{min-height:0;flex-direction:row;align-items:center;padding:11px 13px}.chip-icon{flex-shrink:0}.message{max-width:97%}.bubble{font-size:13px;padding:11px 13px}.composer-wrap{padding:0 9px 10px}.composer{gap:6px;padding:7px;border-radius:17px}.icon-button{width:39px;height:41px;border-radius:12px}.send{width:42px;height:41px;border-radius:12px}.footnote{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="overlay" id="overlay"></div>
 <div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="logo">S</div><div class="brandname">Simple <span>AI</span></div><div class="version">v.0.0.3</div></div>
-    <button class="newchat" id="newChat"><span>＋</span> گفت‌وگوی جدید</button>
-    <div class="section-label">گفت‌وگوها</div>
-    <div class="history-empty" id="historyEmpty">هنوز گفت‌وگویی ذخیره نشده.<br>اولین گفت‌وگوت رو شروع کن.</div>
-    <div id="historyList"></div>
-    <div class="sidebar-bottom"><div class="status"><span class="dot"></span> اجرای مدل روی گوشی</div><div>Simple AI · v.0.0.3</div><div>گفت‌وگوی متنی محلی؛ بدون API ابری</div></div>
-  </aside>
-  <main class="main">
-    <header class="topbar">
-      <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
-      <div class="mobile-brand"><div class="logo">S</div><span>Simple <span style="color:var(--green)">AI</span></span></div>
-      <div class="top-title-wrap"><div class="top-title">گفت‌وگوی هوشمند</div><div class="top-sub">ساده، محترمانه، همراه تو</div></div>
-      <div class="top-spacer"></div><div class="version">v.0.0.3</div>
-      <button class="chip" id="modelButton" type="button" style="padding:8px 10px">آماده‌سازی مدل</button>
-    </header>
-    <div id="modelStatus" role="status" style="padding:9px 18px;background:#f1faf4;border-bottom:1px solid #dceee2;color:#286443;font-size:11px;line-height:1.8">مدل هوش مصنوعی به‌صورت خودکار دریافت و روی گوشی آماده می‌شود؛ حجم تقریبی ۱۶۷ مگابایت.</div>
-    <section class="chat-area" id="chatArea">
-      <div class="welcome" id="welcome">
-        <div class="welcome-logo">S</div>
-        <h1>سلام، من <span>Simple</span> هستم.</h1>
-        <p>خوش اومدی! من اینجام تا با احترام باهات گفت‌وگو کنم، به پرسش‌هات جواب بدم و در فکر کردن و یادگیری کمکت کنم.</p>
-        <div class="chips">
-          <button class="chip" data-prompt="خودت رو معرفی کن">معرفی خودت</button>
-          <button class="chip" data-prompt="می‌تونی در یادگیری برنامه‌نویسی کمکم کنی؟">یادگیری برنامه‌نویسی</button>
-          <button class="chip" data-prompt="امروز درباره چی می‌تونیم صحبت کنیم؟">شروع یک گفت‌وگو</button>
-        </div>
-      </div>
-      <div class="messages" id="messages"></div>
-    </section>
-    <div class="composer-wrap">
-      <form class="composer" id="chatForm">
-        <textarea id="messageInput" rows="1" placeholder="پیامت رو برای Simple بنویس..." aria-label="پیام" maxlength="6000"></textarea>
-        <button class="send" id="sendButton" type="submit" aria-label="ارسال پیام" title="ارسال">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </form>
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="logo">S</div><div class="brand-name">Simple <span>AI</span></div><div class="version">v0.0.4</div></div>
+  <button class="new-chat" id="newChat"><span>＋</span> <span data-i18n="newChat">New chat</span></button>
+  <div class="section-label" data-i18n="recent">Recent conversations</div>
+  <div class="history-empty" id="historyEmpty" data-i18n="emptyHistory">Your conversations will appear here.</div>
+  <div class="history-list" id="historyList"></div>
+  <div class="sidebar-bottom"><div class="status"><span class="dot"></span> <span data-i18n="localAI">On-device AI</span></div><div>Simple AI · Version 0.0.4</div><div data-i18n="privacy">Private local text generation</div></div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+  <div class="mobile-brand"><div class="logo">S</div><span>Simple <span style="color:var(--green)">AI</span></span></div>
+  <div class="top-title-wrap"><div class="top-title" data-i18n="assistant">AI Assistant</div><div class="top-sub" data-i18n="subtitle">A little help for your big ideas</div></div>
+  <div class="spacer"></div>
+  <div class="model-pill"><span class="dot"></span><span id="modelPillText" data-i18n="localModel">Local model</span></div>
+  <select class="language-select" id="languageSelect" aria-label="Language" title="Language">
+    <option value="en">Language: English</option><option value="es">Language: Spanish</option><option value="fr">Language: French</option><option value="de">Language: German</option><option value="fa">Language: Persian</option><option value="ar">Language: Arabic</option><option value="tr">Language: Turkish</option><option value="hi">Language: Hindi</option><option value="zh">Language: Chinese</option><option value="ru">Language: Russian</option><option value="ja">Language: Japanese</option>
+  </select>
+  <button class="model-button" id="modelButton" type="button" data-i18n="setup">Set up AI</button>
+</header>
+<div class="model-status" id="modelStatus" role="status">Preparing your on-device AI model…</div>
+<section class="chat-area" id="chatArea">
+  <div class="welcome" id="welcome">
+    <div class="hero-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5 14.4 9.6 20.5 12l-6.1 2.4L12 20.5l-2.4-6.1L3.5 12l6.1-2.4L12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m19 2 .8 2.2L22 5l-2.2.8L19 8l-.8-2.2L16 5l2.2-.8L19 2Z" fill="currentColor"/></svg></div>
+    <div class="eyebrow" data-i18n="eyebrow">Your personal AI space</div>
+    <h1 data-i18n="headline">Make room for <span>great ideas.</span></h1>
+    <p data-i18n="intro">Ask a question, explore something new, or talk through an idea. Simple AI is designed to run directly on your device.</p>
+    <div class="chips">
+      <button class="chip" data-prompt="Give me a simple explanation of how artificial intelligence works."><span class="chip-icon">✦</span><span data-i18n="chip1">Explain something new</span></button>
+      <button class="chip" data-prompt="Help me create a beginner-friendly programming learning plan."><span class="chip-icon">⌘</span><span data-i18n="chip2">Learn programming</span></button>
+      <button class="chip" data-prompt="Give me three creative ideas for a small personal project."><span class="chip-icon">✧</span><span data-i18n="chip3">Brainstorm ideas</span></button>
     </div>
-    <div class="footnote">Simple می‌تونه اشتباه کنه؛ برای اطلاعات مهم، پاسخ‌ها رو بررسی کن.</div>
-  </main>
+  </div>
+  <div class="messages" id="messages"></div>
+</section>
+<div class="composer-wrap">
+  <form class="composer" id="chatForm">
+    <textarea id="messageInput" rows="1" placeholder="Message Simple AI…" aria-label="Message" maxlength="6000"></textarea>
+    <button class="icon-button" id="voiceButton" type="button" aria-label="Voice input" title="Tap to speak"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3m-4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <button class="send" id="sendButton" type="submit" aria-label="Send message" title="Send message"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12 20 4l-5 16-3.5-6.5L4 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m11.5 13.5 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </form>
+</div>
+<div class="footnote" data-i18n="footnote">Simple AI can make mistakes. Check important information.</div>
+</main>
 </div>
 <script>
-const $ = (id) => document.getElementById(id);
-const input = $('messageInput'), messages = $('messages'), welcome = $('welcome');
-let currentTitle = '';
-let conversations = [];
-let waiting = false;
-
-function resizeInput(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,160)+'px'; }
-input.addEventListener('input', resizeInput);
-input.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){e.preventDefault(); $('chatForm').requestSubmit();} });
-$('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
-$('newChat').addEventListener('click', resetChat);
-document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.prompt;resizeInput();sendMessage();}));
-
-function addMessage(role, text){
-  welcome.style.display='none';
-  const row=document.createElement('div'); row.className='message '+role;
-  const avatar=document.createElement('div'); avatar.className='avatar'; avatar.textContent=role==='user'?'ش':'S';
-  const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text;
-  row.append(avatar,bubble); messages.appendChild(row); scrollBottom(); return row;
-}
-function scrollBottom(){ $('chatArea').scrollTop=$('chatArea').scrollHeight; }
-function setWaiting(on){
-  waiting=on; $('sendButton').disabled=on;
-  const old=$('typingRow'); if(old)old.remove();
-  if(on){const row=document.createElement('div');row.id='typingRow';row.className='message assistant';row.innerHTML='<div class="avatar">S</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>';messages.appendChild(row);scrollBottom();}
-}
-function resetChat(){
-  if(messages.children.length){conversations.push({title:currentTitle||'گفت‌وگوی جدید',html:messages.innerHTML});renderHistory();}
-  messages.innerHTML='';welcome.style.display='block';currentTitle='';input.value='';resizeInput();$('sidebar').classList.remove('open');input.focus();
-}
-function renderHistory(){
-  $('historyList').innerHTML=''; $('historyEmpty').style.display=conversations.length?'none':'block';
-  conversations.slice().reverse().forEach((c,i)=>{const b=document.createElement('button');b.className='chip';b.style.width='100%';b.style.textAlign='right';b.style.marginBottom='7px';b.textContent=c.title;b.addEventListener('click',()=>{messages.innerHTML=c.html;welcome.style.display='none';currentTitle=c.title;$('sidebar').classList.remove('open');scrollBottom();});$('historyList').appendChild(b);});
-}
-let activeLocalRequestId = null;
-let activeLocalBubble = null;
-function updateModelStatus(message){
-  $('modelStatus').textContent = message;
-}
-window.onLocalModelStatus = updateModelStatus;
-window.onLocalModelChunk = (requestId, chunk, done) => {
-  if(requestId !== activeLocalRequestId || !activeLocalBubble) return;
-  $('typingRow')?.remove();
-  activeLocalBubble.textContent += chunk;
-  scrollBottom();
-  if(done === 'true'){
-    setWaiting(false);
-    activeLocalRequestId = null;
-    activeLocalBubble = null;
-  }
-};
-window.onLocalModelError = (requestId, message) => {
-  if(requestId !== activeLocalRequestId) return;
-  setWaiting(false);
-  if(activeLocalBubble) activeLocalBubble.textContent = 'خطا: ' + message;
-  activeLocalRequestId = null;
-  activeLocalBubble = null;
-};
-$('modelButton').addEventListener('click',()=>{
-  if(window.SimpleLocalAI) window.SimpleLocalAI.selectModel();
-  else updateModelStatus('پل ارتباطی اندروید در دسترس نیست؛ لطفاً برنامه را دوباره باز کن.');
-});
-if(window.SimpleLocalAI){
-  updateModelStatus(window.SimpleLocalAI.getModelStatus());
-}
-async function sendMessage(){
-  const text=input.value.trim(); if(!text||waiting)return;
-  if(!window.SimpleLocalAI){
-    addMessage('assistant','این نسخه باید در برنامه اندروید اجرا شود تا به موتور مدل محلی دسترسی داشته باشد.');
-    return;
-  }
-  if(!window.SimpleLocalAI.isModelReady()){
-    updateModelStatus('مدل هنوز آماده نیست؛ دریافت و آماده‌سازی خودکار ممکن است کمی زمان ببرد.');
-    addMessage('assistant','برای پاسخ‌دادن، اول باید مدل هوش مصنوعی را روی گوشی بارگذاری کنیم. لطفاً صبر کن تا برنامه مدل را به‌صورت خودکار دریافت و آماده کند. برای این مرحله اینترنت و حدود ۱ گیگابایت فضای آزاد پیشنهاد می‌شود.');
-    return;
-  }
-  if(!currentTitle)currentTitle=text.length>26?text.slice(0,26)+'…':text;
-  addMessage('user',text); input.value='';resizeInput();
-  const row=addMessage('assistant','');
-  activeLocalBubble=row.querySelector('.bubble');
-  activeLocalRequestId=String(Date.now())+'-'+Math.random().toString(36).slice(2);
-  setWaiting(true);
-  $('sidebar').classList.remove('open');
-  window.SimpleLocalAI.generate(text,activeLocalRequestId);
-}
-$('chatForm').addEventListener('submit',e=>{e.preventDefault();sendMessage();});
+const $=id=>document.getElementById(id),input=$('messageInput'),messages=$('messages'),welcome=$('welcome');
+let currentTitle='',conversations=[],waiting=false,recording=false,selectedLanguage='en',activeLocalRequestId=null,activeLocalBubble=null;
+const languages={en:{newChat:'New chat',recent:'Recent conversations',emptyHistory:'Your conversations will appear here.',localAI:'On-device AI',privacy:'Private local text generation',assistant:'AI Assistant',subtitle:'A little help for your big ideas',localModel:'Local model',setup:'Set up AI',eyebrow:'Your personal AI space',headline:'Make room for <span>great ideas.</span>',intro:'Ask a question, explore something new, or talk through an idea. Simple AI is designed to run directly on your device.',chip1:'Explain something new',chip2:'Learn programming',chip3:'Brainstorm ideas',placeholder:'Message Simple AI…',voice:'Tap to speak',footnote:'Simple AI can make mistakes. Check important information.',ready:'Model ready',setting:'Setting up model',waiting:'Please wait while the AI model downloads and loads on your device.',notReady:'The AI model is not ready yet. Please wait for setup to finish.',voiceError:'Voice input could not start. Check microphone permission and speech services.',listening:'Listening…'},
+es:{newChat:'Nuevo chat',recent:'Conversaciones recientes',emptyHistory:'Tus conversaciones aparecerán aquí.',localAI:'IA en el dispositivo',privacy:'Generación de texto privada y local',assistant:'Asistente de IA',subtitle:'Un poco de ayuda para tus grandes ideas',localModel:'Modelo local',setup:'Configurar IA',eyebrow:'Tu espacio personal de IA',headline:'Haz espacio para <span>grandes ideas.</span>',intro:'Haz una pregunta, descubre algo nuevo o desarrolla una idea. Simple AI está diseñada para funcionar en tu dispositivo.',chip1:'Explicar algo nuevo',chip2:'Aprender programación',chip3:'Lluvia de ideas',placeholder:'Escribe a Simple AI…',voice:'Toca para hablar',footnote:'Simple AI puede equivocarse. Comprueba la información importante.',ready:'Modelo listo',setting:'Preparando modelo',waiting:'Espera mientras el modelo se descarga y carga en tu dispositivo.',notReady:'El modelo de IA aún no está listo.',voiceError:'No se pudo iniciar la entrada de voz.',listening:'Escuchando…'},
+fr:{newChat:'Nouveau chat',recent:'Conversations récentes',emptyHistory:'Vos conversations apparaîtront ici.',localAI:'IA sur l’appareil',privacy:'Génération de texte locale et privée',assistant:'Assistant IA',subtitle:'Un coup de pouce pour vos grandes idées',localModel:'Modèle local',setup:'Configurer l’IA',eyebrow:'Votre espace IA personnel',headline:'Faites place aux <span>grandes idées.</span>',intro:'Posez une question, découvrez quelque chose ou développez une idée. Simple AI fonctionne directement sur votre appareil.',chip1:'Expliquer une nouveauté',chip2:'Apprendre à programmer',chip3:'Trouver des idées',placeholder:'Écrivez à Simple AI…',voice:'Appuyez pour parler',footnote:'Simple AI peut se tromper. Vérifiez les informations importantes.',ready:'Modèle prêt',setting:'Préparation du modèle',waiting:'Patientez pendant le téléchargement et le chargement du modèle.',notReady:'Le modèle IA n’est pas encore prêt.',voiceError:'Impossible de démarrer la saisie vocale.',listening:'Écoute…'},
+de:{newChat:'Neuer Chat',recent:'Letzte Gespräche',emptyHistory:'Deine Gespräche erscheinen hier.',localAI:'KI auf dem Gerät',privacy:'Private lokale Textgenerierung',assistant:'KI-Assistent',subtitle:'Hilfe für deine großen Ideen',localModel:'Lokales Modell',setup:'KI einrichten',eyebrow:'Dein persönlicher KI-Bereich',headline:'Platz für <span>große Ideen.</span>',intro:'Stelle Fragen, entdecke Neues oder entwickle eine Idee. Simple AI läuft direkt auf deinem Gerät.',chip1:'Etwas Neues erklären',chip2:'Programmieren lernen',chip3:'Ideen sammeln',placeholder:'Nachricht an Simple AI…',voice:'Zum Sprechen tippen',footnote:'Simple AI kann Fehler machen. Prüfe wichtige Informationen.',ready:'Modell bereit',setting:'Modell wird vorbereitet',waiting:'Bitte warte, bis das Modell heruntergeladen und geladen ist.',notReady:'Das KI-Modell ist noch nicht bereit.',voiceError:'Spracheingabe konnte nicht gestartet werden.',listening:'Hört zu…'},
+fa:{newChat:'گفت‌وگوی جدید',recent:'گفت‌وگوهای اخیر',emptyHistory:'گفت‌وگوهای شما اینجا نمایش داده می‌شوند.',localAI:'هوش مصنوعی روی دستگاه',privacy:'تولید متن خصوصی و محلی',assistant:'دستیار هوش مصنوعی',subtitle:'کمکی برای ایده‌های بزرگ شما',localModel:'مدل محلی',setup:'راه‌اندازی هوش مصنوعی',eyebrow:'فضای شخصی هوش مصنوعی شما',headline:'برای <span>ایده‌های بزرگ</span> جا باز کنید.',intro:'سؤال بپرسید، چیز تازه‌ای کشف کنید یا ایده‌ای را پرورش دهید. Simple AI برای اجرا روی دستگاه شما طراحی شده است.',chip1:'توضیح یک موضوع تازه',chip2:'یادگیری برنامه‌نویسی',chip3:'ایده‌پردازی',placeholder:'برای Simple AI پیام بنویسید…',voice:'برای صحبت ضربه بزنید',footnote:'Simple AI ممکن است اشتباه کند. اطلاعات مهم را بررسی کنید.',ready:'مدل آماده است',setting:'در حال آماده‌سازی مدل',waiting:'لطفاً منتظر بمانید تا مدل روی دستگاه بارگیری شود.',notReady:'مدل هوش مصنوعی هنوز آماده نیست.',voiceError:'ورودی صوتی شروع نشد.',listening:'در حال گوش دادن…'},
+ar:{newChat:'محادثة جديدة',recent:'المحادثات الأخيرة',emptyHistory:'ستظهر محادثاتك هنا.',localAI:'ذكاء اصطناعي على الجهاز',privacy:'إنشاء نص محلي وخاص',assistant:'مساعد الذكاء الاصطناعي',subtitle:'مساعدة لأفكارك الكبيرة',localModel:'النموذج المحلي',setup:'إعداد الذكاء الاصطناعي',eyebrow:'مساحتك الشخصية للذكاء الاصطناعي',headline:'افسح المجال لـ<span>أفكار عظيمة.</span>',intro:'اطرح سؤالاً أو اكتشف شيئاً جديداً. يعمل Simple AI مباشرة على جهازك.',chip1:'اشرح شيئاً جديداً',chip2:'تعلم البرمجة',chip3:'ابتكر أفكاراً',placeholder:'اكتب رسالة إلى Simple AI…',voice:'اضغط للتحدث',footnote:'قد يخطئ Simple AI. تحقق من المعلومات المهمة.',ready:'النموذج جاهز',setting:'جارٍ إعداد النموذج',waiting:'يرجى الانتظار حتى يتم تنزيل النموذج وتحميله.',notReady:'النموذج غير جاهز بعد.',voiceError:'تعذر بدء الإدخال الصوتي.',listening:'جارٍ الاستماع…'},
+tr:{newChat:'Yeni sohbet',recent:'Son konuşmalar',emptyHistory:'Konuşmalarınız burada görünecek.',localAI:'Cihaz içi yapay zekâ',privacy:'Gizli yerel metin üretimi',assistant:'Yapay Zekâ Asistanı',subtitle:'Büyük fikirleriniz için küçük bir yardım',localModel:'Yerel model',setup:'Yapay zekâyı kur',eyebrow:'Kişisel yapay zekâ alanınız',headline:'<span>Büyük fikirlere</span> yer açın.',intro:'Soru sorun, yeni bir şey keşfedin veya bir fikri geliştirin. Simple AI doğrudan cihazınızda çalışmak üzere tasarlanmıştır.',chip1:'Yeni bir şey öğren',chip2:'Programlama öğren',chip3:'Fikir üret',placeholder:'Simple AI’ye mesaj yazın…',voice:'Konuşmak için dokunun',footnote:'Simple AI hata yapabilir. Önemli bilgileri kontrol edin.',ready:'Model hazır',setting:'Model hazırlanıyor',waiting:'Model indirilip yüklenirken lütfen bekleyin.',notReady:'Yapay zekâ modeli henüz hazır değil.',voiceError:'Ses girişi başlatılamadı.',listening:'Dinleniyor…'},
+hi:{newChat:'नई चैट',recent:'हाल की बातचीत',emptyHistory:'आपकी बातचीत यहाँ दिखाई देगी।',localAI:'डिवाइस पर AI',privacy:'निजी स्थानीय टेक्स्ट जनरेशन',assistant:'AI सहायक',subtitle:'आपके बड़े विचारों के लिए छोटी मदद',localModel:'स्थानीय मॉडल',setup:'AI सेट करें',eyebrow:'आपका निजी AI स्थान',headline:'<span>बड़े विचारों</span> के लिए जगह बनाएँ।',intro:'सवाल पूछें, कुछ नया खोजें या किसी विचार पर चर्चा करें। Simple AI सीधे आपके डिवाइस पर चलने के लिए बनाया गया है।',chip1:'कुछ नया समझें',chip2:'प्रोग्रामिंग सीखें',chip3:'नए विचार सोचें',placeholder:'Simple AI को संदेश लिखें…',voice:'बोलने के लिए टैप करें',footnote:'Simple AI गलतियाँ कर सकता है। महत्वपूर्ण जानकारी जाँचें।',ready:'मॉडल तैयार',setting:'मॉडल तैयार हो रहा है',waiting:'मॉडल डाउनलोड और लोड होने तक प्रतीक्षा करें।',notReady:'AI मॉडल अभी तैयार नहीं है।',voiceError:'वॉइस इनपुट शुरू नहीं हो सका।',listening:'सुन रहा है…'},
+zh:{newChat:'新对话',recent:'最近的对话',emptyHistory:'你的对话会显示在这里。',localAI:'设备端 AI',privacy:'私密本地文本生成',assistant:'AI 助手',subtitle:'为你的精彩想法提供帮助',localModel:'本地模型',setup:'设置 AI',eyebrow:'你的个人 AI 空间',headline:'为<span>精彩创意</span>留出空间。',intro:'提出问题、探索新事物或讨论想法。Simple AI 旨在直接在你的设备上运行。',chip1:'解释新知识',chip2:'学习编程',chip3:'头脑风暴',placeholder:'给 Simple AI 发消息…',voice:'轻触说话',footnote:'Simple AI 可能会出错。请核实重要信息。',ready:'模型已就绪',setting:'正在准备模型',waiting:'请等待模型下载并加载完成。',notReady:'AI 模型尚未就绪。',voiceError:'无法启动语音输入。',listening:'正在聆听…'},
+ru:{newChat:'Новый чат',recent:'Недавние беседы',emptyHistory:'Ваши беседы появятся здесь.',localAI:'ИИ на устройстве',privacy:'Локальная генерация текста',assistant:'ИИ-помощник',subtitle:'Помощь для ваших больших идей',localModel:'Локальная модель',setup:'Настроить ИИ',eyebrow:'Ваше личное пространство ИИ',headline:'Место для <span>больших идей.</span>',intro:'Задавайте вопросы и исследуйте новое. Simple AI создан для работы прямо на вашем устройстве.',chip1:'Объяснить новое',chip2:'Изучать программирование',chip3:'Придумать идеи',placeholder:'Сообщение для Simple AI…',voice:'Нажмите, чтобы говорить',footnote:'Simple AI может ошибаться. Проверяйте важную информацию.',ready:'Модель готова',setting:'Подготовка модели',waiting:'Подождите, пока модель загрузится и запустится.',notReady:'Модель ИИ ещё не готова.',voiceError:'Не удалось запустить голосовой ввод.',listening:'Слушаю…'},
+ja:{newChat:'新しいチャット',recent:'最近の会話',emptyHistory:'会話がここに表示されます。',localAI:'端末内 AI',privacy:'プライベートなローカル文章生成',assistant:'AI アシスタント',subtitle:'大きなアイデアをサポート',localModel:'ローカルモデル',setup:'AI をセットアップ',eyebrow:'あなた専用の AI スペース',headline:'<span>素晴らしいアイデア</span>のために。',intro:'質問したり、新しいことを発見したり、アイデアを話し合ったりできます。Simple AI は端末上で動作するよう設計されています。',chip1:'新しいことを説明',chip2:'プログラミングを学ぶ',chip3:'アイデアを考える',placeholder:'Simple AI にメッセージ…',voice:'タップして話す',footnote:'Simple AI は間違えることがあります。重要な情報は確認してください。',ready:'モデル準備完了',setting:'モデルを準備中',waiting:'モデルのダウンロードと読み込みをお待ちください。',notReady:'AI モデルはまだ準備できていません。',voiceError:'音声入力を開始できませんでした。',listening:'聞き取り中…'}};
+function t(k){return (languages[selectedLanguage]||languages.en)[k]||languages.en[k]||k}
+function applyLanguage(code){selectedLanguage=languages[code]?code:'en';const rtl=['fa','ar'].includes(selectedLanguage);document.documentElement.lang=selectedLanguage;document.documentElement.dir=rtl?'rtl':'ltr';document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.dataset.i18n;el.innerHTML=t(key)});input.placeholder=t('placeholder');input.setAttribute('aria-label',t('placeholder'));$('voiceButton').title=t('voice');$('voiceButton').setAttribute('aria-label',t('voice'));$('languageSelect').value=selectedLanguage;try{if(window.SimpleLocalAI)window.SimpleLocalAI.setVoiceLanguage(selectedLanguage)}catch(e){}}
+$('languageSelect').addEventListener('change',e=>applyLanguage(e.target.value));applyLanguage('en');
+function resizeInput(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,150)+'px'}input.addEventListener('input',resizeInput);input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('chatForm').requestSubmit()}});
+function closeMenu(){$('sidebar').classList.remove('open');$('overlay').classList.remove('show')}$('menuToggle').addEventListener('click',()=>{$('sidebar').classList.toggle('open');$('overlay').classList.toggle('show')});$('overlay').addEventListener('click',closeMenu);$('newChat').addEventListener('click',resetChat);
+document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.prompt;resizeInput();sendMessage()}));
+function addMessage(role,text){welcome.style.display='none';const row=document.createElement('div');row.className='message '+role;const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=role==='user'?'You':'S';const bubble=document.createElement('div');bubble.className='bubble';bubble.textContent=text;row.append(avatar,bubble);messages.appendChild(row);scrollBottom();return row}
+function scrollBottom(){$('chatArea').scrollTop=$('chatArea').scrollHeight}
+function setWaiting(on){waiting=on;$('sendButton').disabled=on;const old=$('typingRow');if(old)old.remove();if(on){const row=document.createElement('div');row.id='typingRow';row.className='message assistant';row.innerHTML='<div class="avatar">S</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>';messages.appendChild(row);scrollBottom()}}
+function resetChat(){if(messages.children.length){conversations.push({title:currentTitle||'New chat',html:messages.innerHTML});renderHistory()}messages.innerHTML='';welcome.style.display='block';currentTitle='';input.value='';resizeInput();closeMenu();input.focus()}
+function renderHistory(){$('historyList').innerHTML='';$('historyEmpty').style.display=conversations.length?'none':'block';conversations.slice().reverse().forEach(c=>{const b=document.createElement('button');b.className='history-item';b.textContent=c.title;b.addEventListener('click',()=>{messages.innerHTML=c.html;welcome.style.display='none';currentTitle=c.title;closeMenu();scrollBottom()});$('historyList').appendChild(b)})}
+function updateModelStatus(message){$('modelStatus').textContent=message;const low=String(message).toLowerCase();$('modelPillText').textContent=/ready|prepared/i.test(low)?t('ready'):/download|prepar|setup|loading/i.test(low)?t('setting'):t('localModel')}
+window.onLocalModelStatus=updateModelStatus;
+window.onLocalModelChunk=(requestId,chunk,done)=>{if(requestId!==activeLocalRequestId||!activeLocalBubble)return;$('typingRow')?.remove();activeLocalBubble.textContent+=chunk;scrollBottom();if(done==='true'){setWaiting(false);activeLocalRequestId=null;activeLocalBubble=null}};
+window.onLocalModelError=(requestId,message)=>{if(requestId!==activeLocalRequestId)return;setWaiting(false);if(activeLocalBubble)activeLocalBubble.textContent='Error: '+message;activeLocalRequestId=null;activeLocalBubble=null};
+window.onVoiceResult=text=>{recording=false;$('voiceButton').classList.remove('recording');$('voiceButton').title=t('voice');if(text){input.value=(input.value.trim()?input.value.trim()+' ':'')+text;resizeInput();input.focus()}};
+window.onVoiceStatus=message=>{if(message)$('modelStatus').textContent=message;recording=false;$('voiceButton').classList.remove('recording');$('voiceButton').title=t('voice')};
+$('voiceButton').addEventListener('click',()=>{if(!window.SimpleLocalAI){updateModelStatus(t('voiceError'));return}recording=true;$('voiceButton').classList.add('recording');$('voiceButton').title=t('listening');window.SimpleLocalAI.startVoiceInput(selectedLanguage)});
+$('modelButton').addEventListener('click',()=>{if(window.SimpleLocalAI)window.SimpleLocalAI.selectModel();else updateModelStatus('Android bridge is not available. Reopen the app.')});
+if(window.SimpleLocalAI)updateModelStatus(window.SimpleLocalAI.getModelStatus());
+function sendMessage(){const text=input.value.trim();if(!text||waiting)return;if(!window.SimpleLocalAI){addMessage('assistant','Please open Simple AI on your Android device to use the local AI engine.');return}if(!window.SimpleLocalAI.isModelReady()){updateModelStatus(t('notReady'));addMessage('assistant',t('waiting'));return}if(!currentTitle)currentTitle=text.length>26?text.slice(0,26)+'…':text;addMessage('user',text);input.value='';resizeInput();activeLocalBubble=addMessage('assistant','').querySelector('.bubble');activeLocalRequestId=String(Date.now())+'-'+Math.random().toString(36).slice(2);setWaiting(true);closeMenu();window.SimpleLocalAI.generate(text,activeLocalRequestId)}
+$('chatForm').addEventListener('submit',e=>{e.preventDefault();sendMessage()});
 </script>
 </body>
 </html>
