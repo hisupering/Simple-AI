@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
     private final ExecutorService modelExecutor = Executors.newSingleThreadExecutor();
     private volatile boolean modelLoading = false;
     private volatile String modelStatus = "برای شروع، فایل مدل .task را انتخاب کن.";
+    private volatile String activeRequestId = "";
     private File modelFile;
 
     @Override
@@ -121,7 +122,7 @@ public class MainActivity extends Activity {
                                 .setMaxTokens(512)
                                 .setResultListener((partialResult, done) -> {
                                     // Partial chunks are streamed to the chat UI.
-                                    sendJs("onLocalModelChunk", partialResult, done ? "true" : "false");
+                                    sendJs("onLocalModelChunk", activeRequestId, partialResult, done ? "true" : "false");
                                 })
                                 .setErrorListener(error -> {
                                     String message = "خطای مدل: " + safeMessage(error);
@@ -166,6 +167,7 @@ public class MainActivity extends Activity {
         public void generate(String prompt, String requestId) {
             modelExecutor.execute(() -> {
                 LlmInference engine = llmInference;
+                activeRequestId = requestId;
                 if (engine == null) {
                     sendJs("onLocalModelError", requestId, "هنوز مدلی بارگذاری نشده. اول فایل مدل .task را انتخاب کن.");
                     return;
